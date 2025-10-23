@@ -36,17 +36,6 @@
             <artifactId>quarkus-smallrye-openapi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graalvm.polyglot</groupId>
-            <artifactId>polyglot</artifactId>
-            <version>25.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graalvm.polyglot</groupId>
-            <artifactId>python</artifactId>
-            <version>25.0.0</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
@@ -121,27 +110,55 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.graalvm.python</groupId>
-                <artifactId>graalpy-maven-plugin</artifactId>
-                <version>25.0.0</version>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <packages>
-                                <!-- Declare Python packages to install via pip. -->
-                                <package>datetime</package>
-                            </packages>
-                        </configuration>
-                        <goals>
-                            <goal>process-graalpy-resources</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>jvm</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <quarkus.package.type>fast-jar</quarkus.package.type>
+                <quarkus.package.jar.enabled>true</quarkus.package.jar.enabled>
+                <skipITs>true</skipITs>
+                <quarkus.native.enabled>false</quarkus.native.enabled>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.graalvm.polyglot</groupId>
+                    <artifactId>polyglot</artifactId>
+                    <version>25.0.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.graalvm.polyglot</groupId>
+                    <artifactId>python</artifactId>
+                    <version>25.0.0</version>
+                    <type>pom</type>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.python</groupId>
+                        <artifactId>graalpy-maven-plugin</artifactId>
+                        <version>25.0.0</version>
+                        <executions>
+                            <execution>
+                                <configuration>
+                                    <packages>
+                                        <package>datetime</package>
+                                    </packages>
+                                </configuration>
+                                <goals>
+                                    <goal>process-graalpy-resources</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>native</id>
             <activation>
