@@ -4,11 +4,11 @@ import jakarta.json.JsonObject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
+import org.jboss.resteasy.reactive.RestQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URI;
@@ -22,7 +22,7 @@ public class GreetingResource {
     @GET
     @Path("recipe-app")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response hello(@QueryParam("from-path") String fromPath) {
+    public Response hello(@RestQuery("from-path") String fromPath) {
         StringBuilder msgStringBuilder = new StringBuilder();
         if(fromPath != null && !fromPath.isBlank()) {
             msgStringBuilder.append("Redirected from path: \"").append(fromPath).append("\" ! ");

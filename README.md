@@ -19,6 +19,8 @@ Native images are specially useful when running microservices, serverless archit
 
 This example project demonstrates both the traditional compilation approach (with polyglot support via GraalVM+Truffle) as the native image compilation approach (without a JVM). You can observe the performance differences at each lifecycle phase and evaluate the trade-offs based on your needs.
 
+In terms of business logic, this app simply creates a Rest Client, that is, a proxy, that access an external recipe app API, and returns one or more recipes as a JSON. This Rest Client is configured as a Service interface, which is injected at a concrete Resource class (RecipeResource), where two business endpoints are defined - which, in turn, call the two methods from this Service: one for retrieving all recipes and another for retrieving one recipe per id. A Response object for these endpoints is then mounted, based on the String responses from Service Rest Client proxy (external API) methods - containing the JSON data from the external API calls. The Response object should not be used as the return of the Service, only as the return from the Resource Controller classes. The Service should return String or any POJO, DTO or Entity class we created, but not a Response object - otherwise the Resource class wouldn't be able to automatically deserialize the Service class response, and we would have to do that manually.     
+
 [**Content and Run**]<br>
 Source code available at github.com, through the following link:<br>
 [https://github.com/danielpm1982/quarkus-recipe-catalog](https://github.com/danielpm1982/quarkus-recipe-catalog)<br>
@@ -38,6 +40,11 @@ For building and running the app using the traditional jvm Maven Profile (defaul
    or<br>
    java -jar ./target/quarkus-app/quarkus-run.jar
 
+If running on the "dev" mode, you can visualize quarkus dev UI and OpenAPI auto-generated endpoints, locally, at:<br>
+http://localhost:8080/q/dev-ui
+and
+http://localhost:8080/q/dev-ui/quarkus-smallrye-openapi/swagger-ui .
+
 For building and running the app using the native-image Maven Profile:
 1) Firstly, comment out all package imports and their uses at the code regarding org.graalvm.polyglot dependency - as this is only considered when using the classic jvm Profile. This dependency is not supported or compatible when using native-image Profile;
 2) Building:<br>
@@ -56,7 +63,11 @@ https://quarkus.io and https://www.graalvm.org .
 
 ![graalvm-polyglot-code.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/graalvm-polyglot-code.png)
 
+![swaggerUI.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/swaggerUI.png)
+
 ![java+python-output.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/java%2Bpython-output.png)
+
+![recipes-output.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/recipes-output.png)
 
 [**Support**]<br>
 If you have any suggestion or correction about the content of this repository, please, feel free to open an issue at the project issues' section:<br>
