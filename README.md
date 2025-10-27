@@ -19,7 +19,7 @@ Native images are specially useful when running microservices, serverless archit
 
 This example project demonstrates both the traditional compilation approach (with polyglot support via GraalVM+Truffle) as the native image compilation approach (without a JVM). You can observe the performance differences at each lifecycle phase and evaluate the trade-offs based on your needs.
 
-In terms of business logic, this app simply creates a Rest Client, that is, a proxy, that access an external recipe app API, and returns one or more recipes as a JSON. This Rest Client is configured as a Service interface, which is injected at a concrete Resource class (RecipeResource), where two business endpoints are defined - which, in turn, call the two methods from this Service: one for retrieving all recipes and another for retrieving one recipe per id. A Response object for these endpoints is then mounted, based on the String responses from Service Rest Client proxy (external API) methods - containing the JSON data from the external API calls. The Response object should not be used as the return of the Service, only as the return from the Resource Controller classes. The Service should return String or any POJO, DTO or Entity class we created, but not a Response object - otherwise the Resource class wouldn't be able to automatically deserialize the Service class response, and we would have to do that manually.     
+In terms of business logic, this app simply creates a Rest Client, i.e., a proxy, that access an external recipe app API, and returns one or more recipes as a JSON. This Rest Client is configured as a Service interface, which is injected at a concrete Resource classes, which, in turn, call the methods from this Service: one for retrieving all recipes and another for retrieving one recipe per id. A Response object is then mounted and returned (for each endpoint), based on the String responses from Service Rest Client proxy methods, containing the JSON data from the external API calls. Fault tolerance is fully implemented, with features as timeout, fallback methods, circuit breakers, liveness check and readiness check.    
 
 [**Content and Run**]<br>
 Source code available at github.com, through the following link:<br>
@@ -62,6 +62,10 @@ https://quarkus.io and https://www.graalvm.org .
 [**Printscreen samples**]<br>
 
 ![graalvm-polyglot-code.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/graalvm-polyglot-code.png)
+
+![dev-ui.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/dev-ui.png)
+
+![health-check.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/health-check.png)
 
 ![swaggerUI.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/swaggerUI.png)
 
