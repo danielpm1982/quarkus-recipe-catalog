@@ -1,11 +1,11 @@
 # quarkus-recipe-catalog
-This is a simple Java Web Service project that exemplifies how to use Quarkus, GraalVM and Truffle, in order to run a Polyglot (Java + Python) Rest Web Application
+This is a simple Java Web Service project that exemplifies how to use Quarkus, GraalVM, Truffle and Panache, in order to run a Polyglot (Java + Python) Rest Web Application (with basic CRUD Persistence)
 
 © 2025 Daniel Pinheiro Maia All Rights Reserved<br>
 (see Copyright© License at the end of this text).
 
 [**Description of this repository**]<br>
-This is a simple Java Web Service project that exemplifies how to use Quarkus, GraalVM and Truffle, in order to run a Polyglot (Java + Python) Rest Web Application. It also shows how to compile your code both using traditional compilation (JVM bytecode), as well as using native-code compilation (processor-level binary code).
+This is a simple Java Web Service project that exemplifies how to use Quarkus, GraalVM, Truffle and Panache, in order to run a Polyglot (Java + Python) Rest Web Application (with basic CRUD Persistence). It also shows how to compile your code both using traditional compilation (JVM bytecode), as well as using native-code compilation (processor-level binary code).
 
 Here we present a REST Web Service, written in Java and Python, and built using Quarkus framework + Maven + Oracle GraalVM. GraalVM's JIT (Just-In-Time) and AOT (Ahead-Of-Time) compilers are used in compilation. GraalVM is a high-performance Java Virtual Machine - with its runtime and compilers - which not only supports Java, Scala, and Groovy, but also enables the execution of other popular programming languages in one same application. This polyglot capability is made possible by additional frameworks, such as Truffle and Sulong, which can be integrated with GraalVM.
 
@@ -19,7 +19,9 @@ Native images are specially useful when running microservices, serverless archit
 
 This example project demonstrates both the traditional compilation approach (with polyglot support via GraalVM+Truffle) as the native image compilation approach (without a JVM). You can observe the performance differences at each lifecycle phase and evaluate the trade-offs based on your needs.
 
-In terms of business logic, this app simply creates a Rest Client, i.e., a proxy, that access an external recipe app API, and returns one or more recipes as a JSON. This Rest Client is configured as a Service interface, which is injected at a concrete Resource classes, which, in turn, call the methods from this Service: one for retrieving all recipes and another for retrieving one recipe per id. A Response object is then mounted and returned (for each endpoint), based on the String responses from Service Rest Client proxy methods, containing the JSON data from the external API calls. Fault tolerance is fully implemented, with features as timeout, fallback methods, circuit breakers, liveness check and readiness check.    
+In terms of business logic, this app basically creates a Rest Client, i.e., a proxy, that access an external recipe app API, and returns one or more recipes as a JSON. This Rest Client is configured as a Service interface, which is injected at concrete Resource classes, that, in turn, call the methods from this Service: one for retrieving all recipes and another for retrieving one recipe per id. A Response object is then mounted and returned (for each endpoint), based on the String responses from Service Rest Client proxy methods, containing the JSON data from the external API calls. Fault tolerance management is fully implemented, with features as: timeout, fallback methods, circuit breakers, liveness and readiness check. 
+
+Regarding Persistence, MyClient object data is mapped into an in-memory H2 DB, through the use of Panache framework (which is implemented on top of Hibernate / JPA - ORM). This DB keeps the client id, name, email and a list of favorite recipes' ids at data registries. By using these locally stored favorite recipes' ids, one is able to fetch each client's favorite recipe from the remote API, through the Rest Client proxy. Resource "CRUD" endpoints, for managing the remote API recipes, as well as the local MyClient entities (and DB registries), have been implemented. You can test these through the Swagger interface, as below described. In a real commercial app, a better separation of layers should be designed, regarding the Entities, Repositories, Services and Controllers. The objective here is simply to show the basics of Quarkus, GraalVM, Truffle and Panache.  
 
 [**Content and Run**]<br>
 Source code available at github.com, through the following link:<br>
