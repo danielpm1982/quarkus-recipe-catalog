@@ -21,7 +21,9 @@ This example project demonstrates both the traditional compilation approach (wit
 
 In terms of business logic, this app basically creates a Rest Client, i.e., a proxy, that access an external recipe app API, and returns one or more recipes as a JSON. This Rest Client is configured as a Service interface, which is injected at concrete Resource classes, that, in turn, call the methods from this Service: one for retrieving all recipes and another for retrieving one recipe per id. A Response object is then mounted and returned (for each endpoint), based on the String responses from Service Rest Client proxy methods, containing the JSON data from the external API calls. Fault tolerance management is fully implemented, with features as: timeout, fallback methods, circuit breakers, liveness and readiness check. 
 
-Regarding Persistence, MyClient object data is mapped into an in-memory H2 DB, through the use of Panache framework (which is implemented on top of Hibernate / JPA - ORM). This DB keeps the client id, name, email and a list of favorite recipes' ids at data registries. By using these locally stored favorite recipes' ids, one is able to fetch each client's favorite recipe from the remote API, through the Rest Client proxy. Resource "CRUD" endpoints, for managing the remote API recipes, as well as the local MyClient entities (and DB registries), have been implemented. You can test these through the Swagger interface, as below described. In a real commercial app, a better separation of layers should be designed, regarding the Entities, Repositories, Services and Controllers. The objective here is simply to show the basics of Quarkus, GraalVM, Truffle and Panache.  
+Regarding Persistence, MyClient object data is mapped into an in-memory H2 DB, through the use of Panache framework (which is implemented on top of Hibernate / JPA - ORM). This DB keeps the client id, name, email and a list of favorite recipes' ids at data registries. By using these locally stored favorite recipes' ids, one is able to fetch each client's favorite recipe from the remote API, through the Rest Client proxy. Resource "CRUD" endpoints, for managing the remote API recipes, as well as the local MyClient entities (and DB registries), have been implemented. You can test these through the Swagger interface, as below described. In a real commercial app, a better separation of layers should be designed, regarding the Entities, Repositories, Services and Controllers. The objective here is simply to show the basics of Quarkus, GraalVM, Truffle and Panache.
+
+As to Security, JWT (with RSA-256 encryption) has been chosen for securing Http endpoints using bearer token authorization and role-based access control (RBAC). Quarkus own-validated extensions (and not Spring ones) should be used here, which are in accordance with Jakarta EE and MicroProfile specifications. There are other libs and Security implementation flows, with different specific extensions (e.g. quarkus-oidc), which could be used as well, depending on architecture decisions. OAUTH2 could also be added. Here, we used the simplest and most native way of implementing Security for Quarkus web apps. Read the [Red Hat documentation](https://docs.redhat.com/en/documentation/red_hat_build_of_quarkus/3.20/html/microprofile_json_web_token_jwt_authentication/security-jwt) for more.
 
 [**Content and Run**]<br>
 Source code available at github.com, through the following link:<br>
@@ -69,11 +71,17 @@ https://quarkus.io and https://www.graalvm.org .
 
 ![health-check.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/health-check.png)
 
-![swaggerUI.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/swaggerUI.png)
+![swagger-ui.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/swagger-ui.png)
 
 ![java+python-output.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/java%2Bpython-output.png)
 
 ![recipes-output.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/recipes-output.png)
+
+![secure-endpoint-call.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/secure-endpoint-call.png)
+
+![secure-endpoint-call2.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/secure-endpoint-call2.png)
+
+![authenticate-token.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/authenticate-token.png)
 
 [**Support**]<br>
 If you have any suggestion or correction about the content of this repository, please, feel free to open an issue at the project issues' section:<br>
