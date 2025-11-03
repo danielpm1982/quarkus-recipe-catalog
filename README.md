@@ -25,7 +25,7 @@ Regarding Persistence, MyClient entity data is mapped into a local PostgreSQL DB
 
 As to Security, Json Web Token (JWT), along with public/private RSA-256 encryption keys, has been chosen for securing Http endpoints using bearer token authorization and role-based access control (RBAC). Quarkus own-validated extensions (and not Spring ones) should be used here, which are in accordance with Jakarta EE and MicroProfile specifications. There are other libs and Security implementation flows, with different specific extensions (e.g. quarkus-oidc), which could be used as well, depending on architecture decisions. OAUTH2 could also be added. Here, we used the simplest and most native way of implementing Security for Quarkus web apps. Read the [Red Hat documentation](https://docs.redhat.com/en/documentation/red_hat_build_of_quarkus/3.20/html/microprofile_json_web_token_jwt_authentication/security-jwt) for more.
 
-For Observability (logging, tracing, metrics), of both the REST app endpoints as of the JDBC (JPA) DB calls, OpenTelemetry, Quarkus Micrometer Metrics (Prometheus) and JAEGER UI have been used. The first two as Quarkus extensions, the latter as a local container through the command below (you could also use Docker, instead). These are essential specially for modern cloud-native microservice projects, and have been created or adopted as official projects (among many others) by the [Cloud Native Computing Foundation (CNCF)](https://insights.linuxfoundation.org/collection/cncf), which, in turn, is part of the [Linux Foundation](https://www.linuxfoundation.org).<br>
+For Observability (logging, tracing, metrics), of both the REST app endpoints as of the SQL JDBC/JPA DB calls, OpenTelemetry, Quarkus Micrometer Metrics (Prometheus) and JAEGER UI have been used. The first two as Quarkus extensions, the latter as a local container through the command below (you can use either podman or docker, likewise). These are essential observability capabilities, specially for modern cloud-native microservice apps (distributed apps), and have been created or adopted as official projects (among many others) by the [Cloud Native Computing Foundation (CNCF)](https://insights.linuxfoundation.org/collection/cncf), which, in turn, is part of the [Linux Foundation](https://www.linuxfoundation.org).<br>
 > podman run --name=jaeger -d -p 16686:16686 -p 4317:4317 -e COLLECTOR_OTLP_ENABLED=true jaegertracing/all-in-one:latest
 
 [**Content and Run**]<br>
@@ -35,33 +35,41 @@ Source code available at github.com, through the following link:<br>
 After cloning this project, configuring a project module at your IDE (e.g. IDEA IntelliJ) that points out to your GraalVM installation (e.g. graalvm-jdk-21.0.8+12.1), and from the root folder of this app, at your console...
 
 For building and running the app using the traditional jvm Maven Profile (default):
-1) Firstly, comment in all package imports and their uses at the code regarding org.graalvm.polyglot dependency - as this is considered when using the classic jvm Profile. This dependency is totally supported and compatible when using jvm Profile;
+1) Firstly, comment in all package imports and their uses at the code regarding org.graalvm.polyglot extension - as this is considered when using the classic jvm Profile. This dependency is totally supported and compatible when using jvm Profile. Also, comment out any DBMS extension at pom.xml (including H2), except for PostgreSQL. Comment in the line at application.properties that sets the kind of datasource to postgresql. If you wanna connect the app with a real DB (at Production), also set its url manually (Quarkus won't use Dev Services or Testcontainers, if you do that). 
 2) Building:<br>
    ./mvnw -Pjvm clean package<br>
    or<br>
    ./mvnw clean package
 3) Running:<br>
    ./mvnw quarkus:dev<br>
+   (this runs the mvn profile jvm in "dev" mode, either with H2 or PostgreSQL)<br>
    or<br>
    ./mvnw quarkus:run<br>
+   (this runs the mvn profile jvm in "production" mode, either with H2 or PostgreSQL)<br>
    or<br>
-   java -jar ./target/quarkus-app/quarkus-run.jar
+   java -jar ./target/quarkus-app/quarkus-run.jar<br>
+   (running the built jar directly with "java -jar" only works if you're running H2 DBMS, or if you have already started manually your PostgreSQL DBMS with the DB - it won't start Testcontainers automatically, differently from if you start the app by using Quarkus plugin, as above - which are preferable)
 
-If running on the "dev" mode, you can visualize quarkus dev UI and OpenAPI auto-generated endpoints, locally, at:<br>
-http://localhost:8080/q/dev-ui
-and
-http://localhost:8080/q/dev-ui/quarkus-smallrye-openapi/swagger-ui .
+If running on the "dev" mode, you can visualize quarkus dev UI at:<br>
+http://localhost:8080/q/dev-ui <br>
+If running either on the "dev" or "production" modes, you can visualize Swagger-UI interface at (you can also disable it for production at application.properties file):<br>
+http://localhost:8080/q/dev-ui/quarkus-smallrye-openapi/swagger-ui <br>
+If running either on the "dev" or "production" modes, you can also visualize the following traceability endpoints, as well (you gotta have already started JAEGER UI container manually as above described):<br>
+http://localhost:16686/search <br>
+http://localhost:8080/q/metrics <br>
 
-For building and running the app using the native-image Maven Profile:
-1) Firstly, comment out all package imports and their uses at the code regarding org.graalvm.polyglot dependency - as this is only considered when using the classic jvm Profile. This dependency is not supported or compatible when using native-image Profile;
+For building and running the app using the native Maven Profile (always on "production" mode - there's no "dev" mode here):
+1) Firstly, comment out all package imports and their uses at the code regarding org.graalvm.polyglot extension - as this is only considered when using the classic jvm Profile. This dependency is not supported or compatible when using native-image Profile. Also, as there is no Dev Services or Testcontainers at native images, you gotta create and start the DBMS/DB manually. If you wanna use H2, comment in its extension at the pom.xml and its props at application.properties (comment out all props for PostgreSQL). Conversely, if you wanna use PostgreSQL, comment in its extension at pom.xml and its kind of datasource at the application.properties (comment out all props for H2).     
 2) Building:<br>
    ./mvnw -Pnative clean package<br>
    or<br>
    ./mvnw -Dnative clean package<br>
 3) Running:<br>
    ./target/quarkus-recipe-catalog-1.0.0-SNAPSHOT-runner<br>
+   (this is a standalone executable native image which can be shared anywhere else, for running natively at similar-architecture machines - does not depend on JVMs or Java)<br>
    or<br>
-   java -jar ./target/quarkus-recipe-catalog-1.0.0-SNAPSHOT-native-image-source-jar/quarkus-recipe-catalog-1.0.0-SNAPSHOT-runner.jar
+   java -jar ./target/quarkus-recipe-catalog-1.0.0-SNAPSHOT-native-image-source-jar/quarkus-recipe-catalog-1.0.0-SNAPSHOT-runner.jar <br>
+   (both running cases above only work if you're running H2 DBMS, or if you have already started manually your PostgreSQL DBMS with the DB - running a native image or its corresponding running jar won't start Testcontainers automatically. DBMS containers are not in-built at native images - only in the case of H2)
 
 More about Quarkus and GraalVM at:<br>
 https://quarkus.io and https://www.graalvm.org .
@@ -85,6 +93,26 @@ https://quarkus.io and https://www.graalvm.org .
 ![secure-endpoint-call2.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/secure-endpoint-call2.png)
 
 ![authenticate-token.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/authenticate-token.png)
+
+![dev-services-postgresql.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/dev-services-postgresql.png)
+
+![dev-services-postgresql2.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/dev-services-postgresql2.png)
+
+![jaeger.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger.png)
+
+![jaeger2.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger2.png)
+
+![jaeger3.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger3.png)
+
+![jaeger4.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger4.png)
+
+![jaeger-request.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger-request.png)
+
+![jaeger-connection.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger-connection.png)
+
+![jaeger-sql.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/jaeger-sql.png)
+
+![micrometer-prometheus.png](https://raw.githubusercontent.com/danielpm1982/quarkus-recipe-catalog/refs/heads/master/img/micrometer-prometheus.png)
 
 [**Support**]<br>
 If you have any suggestion or correction about the content of this repository, please, feel free to open an issue at the project issues' section:<br>

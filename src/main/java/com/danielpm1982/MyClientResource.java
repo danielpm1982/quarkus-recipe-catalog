@@ -1,4 +1,5 @@
 package com.danielpm1982;
+import io.micrometer.core.annotation.Counted;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -11,6 +12,7 @@ public class MyClientResource {
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.getMyClients")
     public Response getMyClients(){
         return Response.status(Response.Status.OK)
                 .entity(MyClient.listAll())
@@ -20,6 +22,7 @@ public class MyClientResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.getMyClientById")
     public Response getMyClientById(@RestPath Long id){
         MyClient myClient = MyClient.findById(id);
         if(myClient!=null) {
@@ -37,6 +40,7 @@ public class MyClientResource {
     @GET
     @Path("find-by-email")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.findMyClientByEmail")
     public Response findMyClientsByEmail(@RestQuery String email){
         return Response.status(Response.Status.OK)
                 .entity(MyClient.findClientByEmail(email))
@@ -46,6 +50,7 @@ public class MyClientResource {
     @GET
     @Path("find-by-name")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.findMyClientByName")
     public Response findMyClientsByName(@RestQuery String name){
         return Response.status(Response.Status.OK)
                 .entity(MyClient.findClientByName(name))
@@ -57,6 +62,7 @@ public class MyClientResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Counted(value="counted.addMyClient")
     public Response addMyClient(MyClient myClient){
         myClient.id=null;
         MyClient.persist(myClient); //myClient instance is auto-updated with the actual id from the DB
@@ -70,6 +76,7 @@ public class MyClientResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Counted(value="counted.updateMyClient")
     public Response updateMyClient(MyClient myClientNew){
         MyClient myClientOld = MyClient.findById(myClientNew.id);
         if(myClientOld!=null && myClientNew.name!=null && myClientNew.email!=null && myClientNew.favoriteRecipeIdList!=null) {
@@ -95,6 +102,7 @@ public class MyClientResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Counted(value="counted.patchMyClient")
     public Response patchMyClient(MyClient myClientNew){
         MyClient myClientOld = MyClient.findById(myClientNew.id);
         if(myClientOld!=null) {
@@ -122,6 +130,7 @@ public class MyClientResource {
     @DELETE
     @Path("/{id}")
     @Transactional
+    @Counted(value="counted.deleteMyClient")
     public Response deleteMyClient(@RestPath Long id){
         MyClient myClient = MyClient.findById(id);
         if(myClient!=null) {

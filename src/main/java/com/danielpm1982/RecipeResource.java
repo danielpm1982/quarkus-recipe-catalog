@@ -1,4 +1,5 @@
 package com.danielpm1982;
+import io.micrometer.core.annotation.Counted;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -14,6 +15,7 @@ public class RecipeResource {
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.getRecipes")
     public Response getRecipes(){
         return Response.status(Response.Status.OK)
                 .entity(recipeService.getAllRecipesFromExternalAPI())
@@ -23,6 +25,7 @@ public class RecipeResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.getRecipesById")
     public Response getRecipeById(@RestPath Long id){
         return Response.status(Response.Status.OK)
                 .entity(recipeService.getRecipeByIdFromExternalAPI(id))

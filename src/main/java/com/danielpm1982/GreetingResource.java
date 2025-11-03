@@ -1,4 +1,5 @@
 package com.danielpm1982;
+import io.micrometer.core.annotation.Counted;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.ws.rs.GET;
@@ -22,6 +23,7 @@ public class GreetingResource {
     @GET
     @Path("recipe-app")
     @Produces(MediaType.APPLICATION_JSON)
+    @Counted(value="counted.hello")
     public Response hello(@RestQuery("from-path") String fromPath) {
         StringBuilder msgStringBuilder = new StringBuilder();
         if(fromPath != null && !fromPath.isBlank()) {
